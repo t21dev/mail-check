@@ -31,6 +31,10 @@ GitHub: https://github.com/t21dev/mail-check
 - `cli.js` - CLI entry point
 - `public/llms.txt` - LLM-friendly site description
 
+## Environment Variables
+- `EHLO_HOSTNAME` - Hostname for SMTP EHLO (default: os.hostname())
+- `MAIL_FROM` - Sender for SMTP MAIL FROM (default: verify@mail-check.t21.dev)
+
 ## Conventions
 - Frontend: TypeScript (.tsx)
 - Server actions: `server/actions/*.action.ts`
@@ -41,3 +45,4 @@ GitHub: https://github.com/t21dev/mail-check
 - `"use client"` directive on interactive components (SingleCheck, BulkCheck, ThemeToggle)
 - OG image generated dynamically via `app/opengraph-image.tsx`
 - SEO metadata defined in `app/layout.tsx` (title, description, OG, Twitter cards)
+- SMTP requires port 25 — works locally/VPS, blocked on most cloud platforms

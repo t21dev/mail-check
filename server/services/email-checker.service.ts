@@ -93,25 +93,24 @@ async function checkPort25(): Promise<'open' | 'blocked'> {
   port25Checked = true;
 
   return new Promise((resolve) => {
-    // Try connecting to Gmail's MX on port 25 — the most reliable test
     const s = net.createConnection(25, 'gmail-smtp-in.l.google.com');
     s.setTimeout(5000);
     s.on('connect', () => {
       port25Status = 'open';
       s.destroy();
-      console.log('[diag] Port 25 outbound: OPEN');
+      console.log('[diag] Port 25 outbound: OPEN (direct)');
       resolve('open');
     });
     s.on('timeout', () => {
       port25Status = 'blocked';
       s.destroy();
-      console.log('[diag] Port 25 outbound: BLOCKED (timeout)');
+      console.log('[diag] Port 25 outbound: BLOCKED (timeout) — SMTP verification unavailable');
       resolve('blocked');
     });
     s.on('error', (err) => {
       port25Status = 'blocked';
       s.destroy();
-      console.log(`[diag] Port 25 outbound: BLOCKED (${err.message})`);
+      console.log(`[diag] Port 25 outbound: BLOCKED (${err.message}) — SMTP verification unavailable`);
       resolve('blocked');
     });
   });
@@ -144,12 +143,14 @@ function isSmtpFinal(data: string): boolean {
 // SMTP check — with STARTTLS, proper EHLO, better error classification
 // ---------------------------------------------------------------------------
 
-function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
+async function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
+  const rawSocket = net.createConnection(25, mxHost);
+
   return new Promise((resolve) => {
     let step = 0;
     let resolved = false;
     let buffer = '';
-    let activeSocket: net.Socket;
+    let activeSocket: net.Socket = rawSocket;
     let starttlsSupported = false;
 
     const done = (result: SmtpResult) => {
@@ -165,8 +166,6 @@ function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
       done({ deliverable: false, responseCode: null, error: 'timeout' });
     }, SMTP_TIMEOUT + 3000);
 
-    const rawSocket = net.createConnection(25, mxHost);
-    activeSocket = rawSocket;
     rawSocket.setTimeout(SMTP_TIMEOUT);
 
     rawSocket.on('connect', () => {
