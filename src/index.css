@@ -112,21 +112,30 @@
     margin: 0;
     min-height: 100vh;
   }
+  button,
+  a,
+  [role="tab"],
+  [role="button"],
+  label[for],
+  summary,
+  select {
+    cursor: pointer;
+  }
 }
 
-/* Grid background pattern */
+/* Grid background pattern — very subtle */
 .grid-bg {
   background-image:
-    linear-gradient(var(--color-cyan-glow) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-cyan-glow) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(oklch(0.5 0 0 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.5 0 0 / 4%) 1px, transparent 1px);
+  background-size: 48px 48px;
   background-position: center center;
 }
 
 :root:not(.dark) .grid-bg {
   background-image:
-    linear-gradient(oklch(0.45 0.15 180 / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(0.45 0.15 180 / 4%) 1px, transparent 1px);
+    linear-gradient(oklch(0.5 0 0 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.5 0 0 / 3%) 1px, transparent 1px);
 }
 
 /* Glow effects */
