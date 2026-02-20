@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     // Warn if port 25 is blocked (all SMTP checks will be degraded)
     const port25Blocked = results.some(r => r.smtp.error === 'port25_blocked');
     const warning = port25Blocked
-      ? 'SMTP port 25 is blocked on this server. Results are based on syntax, MX records, and disposable detection only. SMTP deliverability could not be verified.'
+      ? 'SMTP port 25 is blocked on this server — SMTP verification is unavailable. For full accuracy, run mail-check locally or self-host on a VPS. See the README for setup instructions.'
       : undefined;
 
     return NextResponse.json({ results, warning });

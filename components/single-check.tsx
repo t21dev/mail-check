@@ -144,9 +144,14 @@ export function SingleCheck() {
       ) : null}
 
       {warning ? (
-        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 animate-fade-in">
-          <AlertTriangle className="h-4 w-4 shrink-0" />
-          {warning}
+        <div className="flex items-start gap-2 text-amber-600 dark:text-amber-400 text-sm bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 animate-fade-in">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>
+            SMTP port 25 is blocked on this server — SMTP verification is unavailable. For full accuracy,{' '}
+            <a href="https://github.com/t21dev/mail-check#self-hosting" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-500 dark:hover:text-amber-300">
+              run locally or self-host
+            </a>.
+          </span>
         </div>
       ) : null}
 
