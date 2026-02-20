@@ -37,18 +37,9 @@ npx tsx cli.js --csv sample.csv            # CSV file
 npx tsx cli.js --json user@gmail.com       # JSON output
 ```
 
-## Self-Hosting
+## Deploy
 
-### Docker
-
-```bash
-docker build -t mail-check .
-docker run -p 3000:3000 mail-check
-```
-
-### Railway
-
-Push this repo to Railway — the included `Dockerfile` handles everything. Recommended for easy deployment.
+Push to any platform that supports Next.js — Vercel, Railway, Netlify, etc.
 
 ## Tech Stack
 

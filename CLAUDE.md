@@ -39,4 +39,5 @@ GitHub: https://github.com/t21dev/mail-check
 - API endpoint: `POST /api/check` with `{ emails: string[] }`
 - Bulk check limit: 100 emails per request (frontend), 100 per API call (server)
 - `"use client"` directive on interactive components (SingleCheck, BulkCheck, ThemeToggle)
-- Docker output: `standalone` mode via `next.config.ts`
+- OG image generated dynamically via `app/opengraph-image.tsx`
+- SEO metadata defined in `app/layout.tsx` (title, description, OG, Twitter cards)
