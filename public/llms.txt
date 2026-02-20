@@ -1,0 +1,71 @@
+# mail-check
+
+> Verify if email addresses actually exist — without sending them.
+
+mail-check is a free, open-source email verification tool that checks syntax, MX records, and SMTP deliverability in one shot. Available as a web app and CLI.
+
+## Features
+
+- Single and bulk email validation (up to 100 per request)
+- MX record lookup to verify the domain accepts email
+- SMTP mailbox probing to test deliverability
+- Catch-all domain detection
+- Disposable/temporary email detection
+- CSV import and export for bulk results
+- Rate limited to 100 requests per 10 minutes per IP
+
+## API
+
+POST /api/check
+
+Request body:
+```json
+{ "emails": ["user@example.com"] }
+```
+
+Response:
+```json
+{
+  "results": [
+    {
+      "email": "user@example.com",
+      "reachable": "safe",
+      "syntax": { "valid": true },
+      "mx": { "found": true, "records": ["alt1.gmail-smtp-in.l.google.com"] },
+      "smtp": { "deliverable": true, "responseCode": 250 },
+      "isCatchAll": false,
+      "isDisposable": false
+    }
+  ]
+}
+```
+
+### Reachability statuses
+
+- `safe` — Email exists and is deliverable
+- `risky` — Deliverable but domain is catch-all or disposable
+- `invalid` — Bad syntax, no MX records, or SMTP rejection (5xx)
+- `unknown` — Could not determine deliverability
+
+## CLI Usage
+
+```
+npx tsx cli.js user@gmail.com              # single check
+npx tsx cli.js a@test.com b@test.com       # multiple
+npx tsx cli.js --csv emails.csv            # CSV file
+npx tsx cli.js --json user@gmail.com       # JSON output
+```
+
+## Tech Stack
+
+- Next.js (App Router) + React + TypeScript
+- Tailwind CSS v4 + shadcn/ui
+- Node.js DNS and net modules for MX/SMTP checks
+
+## Source Code
+
+https://github.com/t21dev/mail-check
+
+## License
+
+MIT

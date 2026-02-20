@@ -1,8 +1,10 @@
+'use client'
+
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ResultBadge } from './ResultBadge'
+import { ResultBadge } from './result-badge'
 import { Mail, Loader2, Server, ChevronRight, Globe, Flag, AlertTriangle } from 'lucide-react'
 import type { EmailResult, CheckResponse } from '@/types'
 import type { LucideIcon } from 'lucide-react'

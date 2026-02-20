@@ -1,14 +1,14 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { GlowBox, Pill } from '@/components/ui/box'
 import { H1, Paragraph } from '@/components/ui/typography'
-import { SingleCheck } from './components/SingleCheck'
-import { BulkCheck } from './components/BulkCheck'
-import { ThemeToggle } from './components/ThemeToggle'
+import { SingleCheck } from '@/components/single-check'
+import { BulkCheck } from '@/components/bulk-check'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Mail, Users, ShieldCheck, Github, CheckCheck } from 'lucide-react'
 
 const REPO_URL = 'https://github.com/t21dev/mail-check'
 
-function App() {
+export default function Home() {
   return (
     <div className="min-h-screen bg-background grid-bg relative overflow-hidden">
       {/* Top accent line */}
@@ -88,5 +88,3 @@ function App() {
     </div>
   )
 }
-
-export default App

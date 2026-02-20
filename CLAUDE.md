@@ -5,29 +5,38 @@ Node.js + React web app for checking if email addresses exist. Uses MX lookup an
 GitHub: https://github.com/t21dev/mail-check
 
 ## Tech Stack
-- **Frontend**: React + TypeScript + Vite + shadcn/ui + Tailwind CSS v4
-- **Backend**: Express (TypeScript, run via tsx) on port 3001
-- **CLI**: `tsx cli.js` - uses server/email-checker.ts directly
+- **Framework**: Next.js 15 (App Router) with React 19 + TypeScript
+- **Styling**: Tailwind CSS v4 + shadcn/ui
+- **Server**: Next.js Route Handlers + Server Actions
+- **CLI**: `tsx cli.js` - uses server/services/email-checker.service.ts directly
 
 ## Key Commands
-- `npm run dev` - Start both backend and frontend dev servers
-- `npm run build` - Build frontend for production
-- `npm start` - Run production server (serves built frontend)
+- `npm run dev` - Start Next.js dev server
+- `npm run build` - Build for production
+- `npm start` - Run production server
 - `npm run check` - CLI shortcut (`tsx cli.js`)
 
 ## Project Structure
-- `server/index.ts` - Express API server (rate limited: 100 req / 10 min per IP)
-- `server/email-checker.ts` - Core email validation logic (syntax, MX, SMTP, disposable)
-- `src/` - React frontend (TypeScript)
-- `src/types.ts` - Shared TypeScript interfaces
-- `src/components/ui/` - shadcn components (auto-generated, don't edit)
+- `app/layout.tsx` - Root layout (fonts, theme script, metadata)
+- `app/page.tsx` - Home page
+- `app/globals.css` - Tailwind v4 theme
+- `app/api/check/route.ts` - POST Route Handler (rate limited: 100 req / 10 min per IP)
+- `server/actions/check-email.action.ts` - Server Action wrapper
+- `server/services/email-checker.service.ts` - Core email validation logic (syntax, MX, SMTP, disposable)
+- `server/services/rate-limiter.service.ts` - In-memory IP-based rate limiter
+- `components/` - React components (single-check, bulk-check, result-badge, theme-toggle)
+- `components/ui/` - shadcn components (auto-generated, don't edit)
+- `lib/utils.ts` - cn() utility
+- `types/index.ts` - Shared TypeScript interfaces
 - `cli.js` - CLI entry point
-- `Dockerfile` - Multi-stage Docker build for Railway deployment
+- `public/llms.txt` - LLM-friendly site description
 
 ## Conventions
 - Frontend: TypeScript (.tsx)
-- Backend: TypeScript (run with tsx, no compilation step)
-- Path alias: `@/` maps to `src/`
+- Server actions: `server/actions/*.action.ts`
+- Server services: `server/services/*.service.ts`
+- Path alias: `@/` maps to project root (`./`)
 - API endpoint: `POST /api/check` with `{ emails: string[] }`
-- Vite proxies `/api` to `localhost:3001` in dev
 - Bulk check limit: 100 emails per request (frontend), 100 per API call (server)
+- `"use client"` directive on interactive components (SingleCheck, BulkCheck, ThemeToggle)
+- Docker output: `standalone` mode via `next.config.ts`

@@ -10,7 +10,7 @@ function Tabs({
   className,
   orientation = "horizontal",
   ...props
-}) {
+}: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
@@ -40,6 +40,8 @@ function TabsList({
   className,
   variant = "default",
   ...props
+}: React.ComponentProps<typeof TabsPrimitive.List> & {
+  variant?: "default" | "line"
 }) {
   return (
     <TabsPrimitive.List
@@ -53,7 +55,7 @@ function TabsList({
 function TabsTrigger({
   className,
   ...props
-}) {
+}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
@@ -71,7 +73,7 @@ function TabsTrigger({
 function TabsContent({
   className,
   ...props
-}) {
+}: React.ComponentProps<typeof TabsPrimitive.Content>) {
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"

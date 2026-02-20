@@ -3,7 +3,7 @@ export interface EmailResult {
   reachable: 'safe' | 'risky' | 'invalid' | 'unknown'
   syntax: { valid: boolean }
   mx: { found: boolean; records: string[] }
-  smtp: { deliverable: boolean; responseCode?: string }
+  smtp: { deliverable: boolean; responseCode: number | null; error?: string }
   isCatchAll: boolean
   isDisposable: boolean
 }

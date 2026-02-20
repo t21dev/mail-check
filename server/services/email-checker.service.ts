@@ -1,15 +1,6 @@
 import dns from 'dns';
 import net from 'net';
-
-export interface EmailResult {
-  email: string;
-  syntax: { valid: boolean };
-  mx: { found: boolean; records: string[] };
-  smtp: { deliverable: boolean; responseCode: number | null; error?: string };
-  isCatchAll: boolean;
-  isDisposable: boolean;
-  reachable: 'safe' | 'risky' | 'invalid' | 'unknown';
-}
+import type { EmailResult } from '@/types';
 
 const DISPOSABLE_DOMAINS = new Set([
   'mailinator.com', 'guerrillamail.com', 'tempmail.com', 'throwaway.email',

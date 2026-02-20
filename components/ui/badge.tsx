@@ -31,6 +31,9 @@ function Badge({
   variant = "default",
   asChild = false,
   ...props
+}: React.ComponentProps<"span"> & {
+  variant?: "default" | "secondary" | "destructive" | "outline" | "ghost" | "link"
+  asChild?: boolean
 }) {
   const Comp = asChild ? Slot.Root : "span"
 

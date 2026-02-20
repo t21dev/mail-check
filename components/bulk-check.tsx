@@ -1,7 +1,9 @@
+'use client'
+
 import { useState, useRef, useCallback, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { ResultBadge } from './ResultBadge'
+import { ResultBadge } from './result-badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Loader2, Search, AlertTriangle, FileText, Download } from 'lucide-react'
 import Papa from 'papaparse'
@@ -235,7 +237,7 @@ export function BulkCheck() {
                   <span className="hidden md:block text-xs text-muted-foreground">
                     {[r.isCatchAll && 'Catch-all', r.isDisposable && 'Disposable']
                       .filter(Boolean)
-                      .join(', ') || '—'}
+                      .join(', ') || '\u2014'}
                   </span>
                 </div>
               ))}

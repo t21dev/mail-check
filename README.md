@@ -26,7 +26,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## CLI
 
@@ -37,7 +37,9 @@ npx tsx cli.js --csv sample.csv            # CSV file
 npx tsx cli.js --json user@gmail.com       # JSON output
 ```
 
-## Deploy with Docker
+## Self-Hosting
+
+### Docker
 
 ```bash
 docker build -t mail-check .
@@ -46,24 +48,27 @@ docker run -p 3000:3000 mail-check
 
 ### Railway
 
-Push this repo to Railway — the included `Dockerfile` handles everything.
+Push this repo to Railway — the included `Dockerfile` handles everything. Recommended for easy deployment.
 
 ## Tech Stack
 
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS v4 + shadcn/ui
-- **Backend**: Express (TypeScript, run via tsx)
+- **Framework**: Next.js (App Router) + React + TypeScript
+- **Styling**: Tailwind CSS v4 + shadcn/ui
 - **Fonts**: Outfit + JetBrains Mono
 
 ## Project Structure
 
 ```
+app/
+  layout.tsx          Root layout
+  page.tsx            Home page
+  api/check/route.ts  POST endpoint for email checking
 server/
-  index.ts          Express API server
-  email-checker.ts  Core validation logic (syntax, MX, SMTP, disposable)
-src/
-  App.tsx           Main layout with tabs
-  components/       SingleCheck, BulkCheck, ResultBadge
-  types.ts          Shared TypeScript interfaces
+  services/           Core logic (email-checker, rate-limiter)
+  actions/            Server Action wrappers
+components/           SingleCheck, BulkCheck, ResultBadge, ThemeToggle
+types/                Shared TypeScript interfaces
+cli.js                CLI entry point
 ```
 
 ## API
