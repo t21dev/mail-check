@@ -5,17 +5,20 @@
 </p>
 
 <p align="center">
-  Verify if email addresses actually exist — checks syntax, MX records, and SMTP deliverability in one shot.
+  <strong>Verify if email addresses actually exist — without sending them.</strong>
+  <br />
+  <a href="https://mail-check.t21.dev">mail-check.t21.dev</a>
 </p>
 
 ## Features
 
-- Single and bulk email validation
+- Single and bulk email validation (up to 100 per request)
 - MX record lookup + SMTP mailbox probing
 - Disposable & catch-all email detection
+- IP-block aware (detects Spamhaus/blacklist rejections)
 - CSV import / export for bulk results
+- PWA with offline detection
 - IP-based rate limiting (100 req / 10 min)
-- Dark-themed terminal-style UI
 
 ## Quick Start
 
@@ -27,6 +30,10 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Live
+
+[https://mail-check.t21.dev](https://mail-check.t21.dev)
 
 ## CLI
 
@@ -43,7 +50,7 @@ Push to any platform that supports Next.js — Vercel, Railway, Netlify, etc.
 
 ## Tech Stack
 
-- **Framework**: Next.js (App Router) + React + TypeScript
+- **Framework**: Next.js 16 (App Router) + React 19 + TypeScript
 - **Styling**: Tailwind CSS v4 + shadcn/ui
 - **Fonts**: Outfit + JetBrains Mono
 
@@ -64,7 +71,7 @@ cli.js                CLI entry point
 
 ## API
 
-**POST /api/check**
+**POST https://mail-check.t21.dev/api/check**
 
 ```json
 { "emails": ["test@gmail.com"] }

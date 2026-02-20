@@ -7,11 +7,11 @@ const SITE_URL = 'https://mail-check.t21.dev'
 
 export const metadata: Metadata = {
   title: {
-    default: 'mail-check — Verify Email Addresses Instantly',
-    template: '%s | mail-check',
+    default: 'mail-check by t21.dev — Verify Email Addresses Instantly',
+    template: '%s | mail-check by t21.dev',
   },
   description:
-    'Free email verification tool. Check if email addresses actually exist using MX record lookup and SMTP validation — without sending a single email.',
+    'Free email verification tool by t21.dev. Check if email addresses actually exist using MX record lookup and SMTP validation — without sending a single email.',
   keywords: [
     'email verification',
     'email checker',
@@ -32,16 +32,16 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: SITE_URL,
-    siteName: 'mail-check',
-    title: 'mail-check — Verify Email Addresses Instantly',
+    siteName: 'mail-check by t21.dev',
+    title: 'mail-check by t21.dev — Verify Email Addresses Instantly',
     description:
-      'Free email verification tool. Check if email addresses actually exist using MX record lookup and SMTP validation — without sending a single email.',
+      'Free email verification tool by t21.dev. Check if email addresses actually exist using MX record lookup and SMTP validation — without sending a single email.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'mail-check — Verify Email Addresses Instantly',
+    title: 'mail-check by t21.dev — Verify Email Addresses Instantly',
     description:
-      'Free email verification tool. Check syntax, MX records, and SMTP deliverability in one shot.',
+      'Free email verification tool by t21.dev. Check syntax, MX records, and SMTP deliverability in one shot.',
   },
   icons: {
     icon: [

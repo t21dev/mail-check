@@ -1,7 +1,8 @@
 {
-  "name": "mail-check",
+  "name": "mail-check by t21.dev",
   "short_name": "mail-check",
   "description": "Verify if email addresses exist — without sending them.",
+  "id": "https://mail-check.t21.dev/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",

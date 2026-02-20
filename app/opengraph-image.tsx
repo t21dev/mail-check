@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
 
-export const alt = 'mail-check — Verify if email addresses exist'
+export const alt = 'mail-check by t21.dev — Verify if email addresses exist'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -76,6 +76,9 @@ export default async function Image() {
           }}
         >
           mail-check
+          <span style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 400, marginLeft: '4px' }}>
+            by t21.dev
+          </span>
         </div>
 
         {/* Description */}
@@ -129,7 +132,7 @@ export default async function Image() {
             fontFamily: 'monospace',
           }}
         >
-          github.com/t21dev/mail-check
+          mail-check.t21.dev
         </div>
       </div>
     ),

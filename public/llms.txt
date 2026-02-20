@@ -1,8 +1,9 @@
-# mail-check
+# mail-check by t21.dev
 
+> https://mail-check.t21.dev
 > Verify if email addresses actually exist — without sending them.
 
-mail-check is a free, open-source email verification tool that checks syntax, MX records, and SMTP deliverability in one shot. Available as a web app and CLI.
+mail-check is a free, open-source email verification tool that checks syntax, MX records, and SMTP deliverability in one shot. Available as a web app at https://mail-check.t21.dev and as a CLI.
 
 ## Features
 
@@ -16,7 +17,7 @@ mail-check is a free, open-source email verification tool that checks syntax, MX
 
 ## API
 
-POST /api/check
+POST https://mail-check.t21.dev/api/check
 
 Request body:
 ```json
