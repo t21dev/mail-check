@@ -11,7 +11,7 @@ export default async function Image() {
     (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+          background: '#ffffff',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -28,7 +28,7 @@ export default async function Image() {
             position: 'absolute',
             inset: 0,
             backgroundImage:
-              'linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px)',
+              'linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)',
             backgroundSize: '48px 48px',
           }}
         />
@@ -40,8 +40,8 @@ export default async function Image() {
             top: 0,
             left: 0,
             right: 0,
-            height: '3px',
-            background: 'linear-gradient(90deg, transparent, #22d3ee, transparent)',
+            height: '4px',
+            background: 'linear-gradient(90deg, transparent, #0891b2, transparent)',
           }}
         />
 
@@ -51,14 +51,14 @@ export default async function Image() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '24px',
+            marginBottom: '28px',
           }}
         >
-          <svg width="72" height="72" viewBox="0 0 64 64" fill="none">
-            <rect x="4" y="14" width="56" height="36" rx="4" fill="#3B82F6" />
-            <path d="M4 18l28 18 28-18" stroke="#1E40AF" strokeWidth="2" fill="none" />
-            <path d="M8 18l24 15 24-15" stroke="#BFDBFE" strokeWidth="1.5" fill="none" />
-            <circle cx="48" cy="42" r="12" fill="#22C55E" />
+          <svg width="96" height="96" viewBox="0 0 64 64" fill="none">
+            <rect x="4" y="14" width="56" height="36" rx="4" fill="#0891b2" />
+            <path d="M4 18l28 18 28-18" stroke="#065986" strokeWidth="2" fill="none" />
+            <path d="M8 18l24 15 24-15" stroke="#a5f3fc" strokeWidth="1.5" fill="none" />
+            <circle cx="48" cy="42" r="12" fill="#16a34a" />
             <path d="M42 42l4 4 8-8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           </svg>
         </div>
@@ -68,7 +68,7 @@ export default async function Image() {
           style={{
             fontSize: '64px',
             fontWeight: 700,
-            color: '#f1f5f9',
+            color: '#0f172a',
             letterSpacing: '-0.02em',
             display: 'flex',
             alignItems: 'center',
@@ -76,7 +76,7 @@ export default async function Image() {
           }}
         >
           mail-check
-          <span style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 400, marginLeft: '4px' }}>
+          <span style={{ fontSize: '28px', color: '#64748b', fontWeight: 400, marginLeft: '4px' }}>
             by t21.dev
           </span>
         </div>
@@ -85,7 +85,7 @@ export default async function Image() {
         <div
           style={{
             fontSize: '24px',
-            color: '#94a3b8',
+            color: '#475569',
             marginTop: '16px',
             maxWidth: '600px',
             textAlign: 'center',
@@ -108,9 +108,9 @@ export default async function Image() {
               style={{
                 padding: '8px 16px',
                 borderRadius: '9999px',
-                border: '1px solid rgba(34,211,238,0.2)',
-                backgroundColor: 'rgba(34,211,238,0.08)',
-                color: '#22d3ee',
+                border: '1px solid rgba(8,145,178,0.2)',
+                backgroundColor: 'rgba(8,145,178,0.06)',
+                color: '#0891b2',
                 fontSize: '14px',
                 fontWeight: 500,
                 letterSpacing: '0.05em',
@@ -128,7 +128,7 @@ export default async function Image() {
             position: 'absolute',
             bottom: '32px',
             fontSize: '16px',
-            color: '#475569',
+            color: '#94a3b8',
             fontFamily: 'monospace',
           }}
         >
