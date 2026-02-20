@@ -1,4 +1,6 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { OfflineBanner } from '@/components/offline-banner'
+import { PwaRegister } from '@/components/pwa-register'
 import './globals.css'
 
 const SITE_URL = 'https://mail-check.t21.dev'
@@ -43,11 +45,19 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
+  manifest: '/manifest.json',
   robots: {
     index: true,
     follow: true,
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#22d3ee',
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -71,7 +81,9 @@ export default function RootLayout({
             __html: `(function(){var m=document.cookie.match(/(?:^|; )theme=([^;]*)/);var t=m?decodeURIComponent(m[1]):null;if(t==='dark'||(t==null&&matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}})();`,
           }}
         />
+        <OfflineBanner />
         {children}
+        <PwaRegister />
       </body>
     </html>
   )
