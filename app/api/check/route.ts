@@ -42,9 +42,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    console.log(`[api/check] Processing ${emails.length} emails from ${ip}`);
+    const start = Date.now();
     const results = await Promise.all(emails.map(email => checkEmail(email)));
+    console.log(`[api/check] Done: ${emails.length} emails in ${Date.now() - start}ms`);
     return NextResponse.json({ results });
-  } catch {
+  } catch (err) {
+    console.error(`[api/check] Error:`, err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

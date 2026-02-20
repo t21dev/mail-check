@@ -5,7 +5,7 @@ Node.js + React web app for checking if email addresses exist. Uses MX lookup an
 GitHub: https://github.com/t21dev/mail-check
 
 ## Tech Stack
-- **Framework**: Next.js 15 (App Router) with React 19 + TypeScript
+- **Framework**: Next.js 16 (App Router, Turbopack) with React 19 + TypeScript
 - **Styling**: Tailwind CSS v4 + shadcn/ui
 - **Server**: Next.js Route Handlers + Server Actions
 - **CLI**: `tsx cli.js` - uses server/services/email-checker.service.ts directly

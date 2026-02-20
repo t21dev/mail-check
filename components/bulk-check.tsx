@@ -5,7 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ResultBadge } from './result-badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Loader2, Search, AlertTriangle, FileText, Download } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Loader2, Search, AlertTriangle, FileText, Download, Maximize2 } from 'lucide-react'
 import Papa from 'papaparse'
 import type { EmailResult, CheckResponse } from '@/types'
 
@@ -59,6 +66,7 @@ export function BulkCheck() {
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState('')
   const [error, setError] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const handleCheck = useCallback(async () => {
@@ -140,19 +148,57 @@ export function BulkCheck() {
 
   return (
     <div className="space-y-4">
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent
+          showCloseButton
+          className="!fixed !inset-4 !top-4 !left-4 !right-4 !bottom-4 !translate-x-0 !translate-y-0 !max-w-none !w-auto !h-auto flex flex-col"
+        >
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <DialogTitle className="text-sm font-medium">Bulk Email Input</DialogTitle>
+              {emailCount > 0 ? (
+                <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${overLimit ? 'text-red-400 bg-red-400/10' : 'text-muted-foreground/50 bg-surface'}`}>
+                  {emailCount}/{MAX_EMAILS}
+                </span>
+              ) : null}
+            </div>
+          </DialogHeader>
+          <div className="flex-1 min-h-0">
+            <Textarea
+              autoFocus
+              placeholder="Paste emails — one per line, comma or semicolon separated..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="bg-surface border-border font-mono text-sm resize-none placeholder:text-muted-foreground/40 h-full w-full"
+            />
+          </div>
+          <DialogFooter showCloseButton />
+        </DialogContent>
+      </Dialog>
+
       <div className="relative">
         <Textarea
           placeholder="Paste emails — one per line, comma or semicolon separated..."
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={5}
-          className="bg-surface border-border font-mono text-sm resize-none placeholder:text-muted-foreground/40"
+          className="bg-surface border-border font-mono text-sm resize-y placeholder:text-muted-foreground/40 min-h-[120px]"
         />
-        {emailCount > 0 ? (
-          <span className={`absolute bottom-2 right-2 text-xs font-mono px-1.5 py-0.5 rounded ${overLimit ? 'text-red-400 bg-red-400/10' : 'text-muted-foreground/50 bg-surface'}`}>
-            {emailCount}/{MAX_EMAILS}
-          </span>
-        ) : null}
+        <div className="absolute bottom-2 right-2 flex items-center gap-2">
+          {emailCount > 0 ? (
+            <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${overLimit ? 'text-red-400 bg-red-400/10' : 'text-muted-foreground/50 bg-surface'}`}>
+              {emailCount}/{MAX_EMAILS}
+            </span>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="p-1 rounded text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            title="Expand to fullscreen"
+          >
+            <Maximize2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -184,6 +230,16 @@ export function BulkCheck() {
           className="hidden"
           onChange={handleCsvUpload}
         />
+        <Button
+          variant="outline"
+          asChild
+          className="border-border text-muted-foreground hover:text-foreground hover:border-cyan-accent/30 h-9 ml-auto"
+        >
+          <a href="/sample-emails.csv" download>
+            <Download className="h-4 w-4 mr-2" />
+            Sample CSV
+          </a>
+        </Button>
       </div>
 
       {loading ? (

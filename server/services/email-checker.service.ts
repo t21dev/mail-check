@@ -87,7 +87,7 @@ interface SmtpResult {
 
 function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
   return new Promise((resolve) => {
-    const timeout = 10000;
+    const timeout = 8000;
     let step = 0;
     let resolved = false;
 
@@ -98,15 +98,40 @@ function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
       resolve(result);
     };
 
+    // Hard deadline fallback in case socket events never fire
+    const hardTimeout = setTimeout(() => {
+      console.log(`[smtp] Hard timeout for ${email} via ${mxHost}`);
+      done({ deliverable: false, responseCode: null, error: 'hard timeout' });
+    }, timeout + 2000);
+
     const socket = net.createConnection(25, mxHost);
     socket.setTimeout(timeout);
 
-    socket.on('timeout', () => done({ deliverable: false, responseCode: null, error: 'timeout' }));
-    socket.on('error', (err) => done({ deliverable: false, responseCode: null, error: err.message }));
+    socket.on('connect', () => {
+      console.log(`[smtp] Connected to ${mxHost}:25 for ${email}`);
+    });
+
+    socket.on('timeout', () => {
+      console.log(`[smtp] Timeout for ${email} via ${mxHost} at step ${step}`);
+      clearTimeout(hardTimeout);
+      done({ deliverable: false, responseCode: null, error: 'timeout' });
+    });
+
+    socket.on('error', (err) => {
+      console.log(`[smtp] Error for ${email} via ${mxHost}: ${err.message}`);
+      clearTimeout(hardTimeout);
+      done({ deliverable: false, responseCode: null, error: err.message });
+    });
+
+    socket.on('close', () => {
+      clearTimeout(hardTimeout);
+      done({ deliverable: false, responseCode: null, error: 'connection closed' });
+    });
 
     socket.on('data', (data) => {
-      const response = data.toString();
+      const response = data.toString().trim();
       const code = parseInt(response.substring(0, 3), 10);
+      console.log(`[smtp] ${email} step=${step} code=${code} response=${response.substring(0, 80)}`);
 
       if (step === 0 && code === 220) {
         step = 1;
@@ -120,6 +145,7 @@ function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
       } else if (step === 3) {
         step = 4;
         socket.write('QUIT\r\n');
+        clearTimeout(hardTimeout);
         done({
           deliverable: code === 250,
           responseCode: code,
@@ -130,10 +156,13 @@ function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
 }
 
 export async function checkEmail(email: string): Promise<EmailResult> {
+  const start = Date.now();
   email = email.trim().toLowerCase();
+  console.log(`[check] Starting: ${email}`);
 
   const syntax = checkSyntax(email);
   if (!syntax.valid) {
+    console.log(`[check] Invalid syntax: ${email} (${Date.now() - start}ms)`);
     return {
       email,
       syntax,
@@ -148,8 +177,10 @@ export async function checkEmail(email: string): Promise<EmailResult> {
   const domain = email.split('@')[1];
   const isDisposable = DISPOSABLE_DOMAINS.has(domain);
   const mx = await checkMx(domain);
+  console.log(`[check] MX for ${domain}: found=${mx.found} records=[${mx.records.join(', ')}] (${Date.now() - start}ms)`);
 
   if (!mx.found) {
+    console.log(`[check] No MX: ${email} (${Date.now() - start}ms)`);
     return {
       email,
       syntax,
@@ -164,18 +195,23 @@ export async function checkEmail(email: string): Promise<EmailResult> {
   const mxHost = mx.records[0];
   let smtp: SmtpResult;
   try {
+    console.log(`[check] SMTP check: ${email} via ${mxHost}`);
     smtp = await smtpCheck(mxHost, email);
+    console.log(`[check] SMTP result: ${email} deliverable=${smtp.deliverable} code=${smtp.responseCode} (${Date.now() - start}ms)`);
   } catch {
+    console.log(`[check] SMTP failed: ${email} (${Date.now() - start}ms)`);
     smtp = { deliverable: false, responseCode: null, error: 'connection failed' };
   }
 
   let isCatchAll = false;
   try {
     const randomEmail = `test-${Date.now()}-${Math.random().toString(36).slice(2)}@${domain}`;
+    console.log(`[check] Catch-all check: ${domain}`);
     const catchAllResult = await smtpCheck(mxHost, randomEmail);
     isCatchAll = catchAllResult.deliverable;
+    console.log(`[check] Catch-all result: ${domain} isCatchAll=${isCatchAll} (${Date.now() - start}ms)`);
   } catch {
-    // ignore catch-all check failures
+    console.log(`[check] Catch-all failed: ${domain} (${Date.now() - start}ms)`);
   }
 
   let reachable: EmailResult['reachable'] = 'unknown';
