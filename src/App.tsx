@@ -4,7 +4,7 @@ import { H1, Paragraph } from '@/components/ui/typography'
 import { SingleCheck } from './components/SingleCheck'
 import { BulkCheck } from './components/BulkCheck'
 import { ThemeToggle } from './components/ThemeToggle'
-import { Mail, Users, ShieldCheck, Github } from 'lucide-react'
+import { Mail, Users, ShieldCheck, Github, CheckCheck } from 'lucide-react'
 
 const REPO_URL = 'https://github.com/t21dev/mail-check'
 
@@ -26,9 +26,13 @@ function App() {
             <ShieldCheck className="h-3 w-3" />
             MX + SMTP Validation
           </Pill>
-          <H1>mail-check</H1>
+          <br />
+          <H1 className="inline-flex items-center gap-2 justify-center">
+            mail-check
+            <CheckCheck className="h-7 w-7 sm:h-8 sm:w-8 text-cyan-accent" />
+          </H1>
           <Paragraph className="max-w-md mx-auto">
-            Verify deliverability of any email address through DNS and SMTP protocol checks.
+            Check if email addresses exist — without sending them.
           </Paragraph>
         </header>
 

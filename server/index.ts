@@ -51,7 +51,7 @@ app.post('/api/check', apiLimiter, async (req: Request<{}, {}, CheckBody>, res: 
 });
 
 // SPA fallback for production
-app.get('*', (_req: Request, res: Response) => {
+app.get('/{*path}', (_req: Request, res: Response) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
