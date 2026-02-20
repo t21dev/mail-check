@@ -1,10 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Suspense } from 'react'
 import { GlowBox, Pill } from '@/components/ui/box'
 import { H1, Paragraph } from '@/components/ui/typography'
-import { SingleCheck } from '@/components/single-check'
-import { BulkCheck } from '@/components/bulk-check'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { Mail, Users, ShieldCheck, Github, CheckCheck } from 'lucide-react'
+import { CheckTabs } from '@/components/check-tabs'
+import { ShieldCheck, Github, CheckCheck } from 'lucide-react'
 
 const REPO_URL = 'https://github.com/t21dev/mail-check'
 
@@ -38,35 +37,9 @@ export default function Home() {
 
         {/* Main card */}
         <GlowBox className="opacity-0 animate-fade-up stagger-2">
-          <Tabs defaultValue="single">
-            <div className="border-b border-border px-1 pt-1">
-              <TabsList className="w-full bg-transparent gap-1 h-auto p-0">
-                <TabsTrigger
-                  value="single"
-                  className="flex-1 flex items-center justify-center gap-2 rounded-t-lg rounded-b-none border-b-2 border-transparent data-[state=active]:border-cyan-accent data-[state=active]:bg-cyan-subtle data-[state=active]:text-cyan-accent px-4 py-2.5 text-sm font-medium transition-all"
-                >
-                  <Mail className="h-4 w-4" />
-                  Single
-                </TabsTrigger>
-                <TabsTrigger
-                  value="bulk"
-                  className="flex-1 flex items-center justify-center gap-2 rounded-t-lg rounded-b-none border-b-2 border-transparent data-[state=active]:border-cyan-accent data-[state=active]:bg-cyan-subtle data-[state=active]:text-cyan-accent px-4 py-2.5 text-sm font-medium transition-all"
-                >
-                  <Users className="h-4 w-4" />
-                  Bulk
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <div className="p-5 sm:p-6">
-              <TabsContent value="single" className="mt-0">
-                <SingleCheck />
-              </TabsContent>
-              <TabsContent value="bulk" className="mt-0">
-                <BulkCheck />
-              </TabsContent>
-            </div>
-          </Tabs>
+          <Suspense>
+            <CheckTabs />
+          </Suspense>
         </GlowBox>
 
         {/* Footer */}
