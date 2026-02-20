@@ -105,8 +105,8 @@ export function SingleCheck() {
 
   return (
     <div className="space-y-5">
-      <div className="flex gap-2">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="relative flex-1 w-full">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
           <Input
             type="email"
@@ -120,7 +120,7 @@ export function SingleCheck() {
         <Button
           onClick={handleCheck}
           disabled={loading || !email.trim()}
-          className="bg-cyan-accent hover:bg-cyan-accent/90 text-background font-medium h-10 px-5 transition-all"
+          className="bg-cyan-accent hover:bg-cyan-accent/90 text-background font-medium h-10 px-5 transition-all w-full sm:w-auto"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" />

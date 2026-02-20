@@ -202,11 +202,11 @@ export function BulkCheck() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Button
           onClick={handleCheck}
           disabled={loading || !text.trim() || overLimit}
-          className="bg-cyan-accent hover:bg-cyan-accent/90 text-background font-medium h-9 px-4 transition-all"
+          className="bg-cyan-accent hover:bg-cyan-accent/90 text-background font-medium h-9 px-4 transition-all w-full sm:w-auto"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -219,7 +219,7 @@ export function BulkCheck() {
           variant="outline"
           onClick={() => fileRef.current?.click()}
           disabled={loading}
-          className="border-border text-muted-foreground hover:text-foreground hover:border-cyan-accent/30 h-9"
+          className="border-border text-muted-foreground hover:text-foreground hover:border-cyan-accent/30 h-9 w-full sm:w-auto"
         >
           <FileText className="h-4 w-4 mr-2" />
           CSV
@@ -234,7 +234,7 @@ export function BulkCheck() {
         <Button
           variant="outline"
           asChild
-          className="border-border text-muted-foreground hover:text-foreground hover:border-cyan-accent/30 h-9 ml-auto"
+          className="border-border text-muted-foreground hover:text-foreground hover:border-cyan-accent/30 h-9 w-full sm:w-auto sm:ml-auto"
         >
           <a href="/sample-emails.csv" download>
             <Download className="h-4 w-4 mr-2" />
@@ -318,8 +318,8 @@ export function BulkCheck() {
             </div>
 
             {summary ? (
-              <div className="border-t border-border bg-surface-overlay/50 px-4 py-2 flex items-center justify-between">
-                <div className="flex gap-4 text-xs font-mono text-muted-foreground">
+              <div className="border-t border-border bg-surface-overlay/50 px-4 py-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap gap-4 text-xs font-mono text-muted-foreground">
                   <span className="text-emerald-400">{summary.safe} safe</span>
                   <span className="text-amber-400">{summary.risky} risky</span>
                   <span className="text-red-400">{summary.invalid} invalid</span>
@@ -329,7 +329,7 @@ export function BulkCheck() {
                   variant="ghost"
                   size="sm"
                   onClick={() => exportCsv(results)}
-                  className="h-7 px-2 text-xs text-muted-foreground hover:text-cyan-accent"
+                  className="h-7 px-2 text-xs text-muted-foreground hover:text-cyan-accent self-start sm:self-auto"
                 >
                   <Download className="h-3.5 w-3.5 mr-1" />
                   Export CSV
