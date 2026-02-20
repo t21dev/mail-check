@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ResultBadge } from './result-badge'
+import { StatusLegend } from './status-legend'
 import { Mail, Loader2, Server, ChevronRight, Globe, Flag, AlertTriangle } from 'lucide-react'
 import type { EmailResult, CheckResponse } from '@/types'
 import type { LucideIcon } from 'lucide-react'
@@ -170,6 +171,7 @@ export function SingleCheck() {
               )
             })}
           </div>
+          <StatusLegend />
         </div>
       ) : null}
     </div>

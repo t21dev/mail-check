@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { OfflineBanner } from '@/components/offline-banner'
 import { PwaRegister } from '@/components/pwa-register'
 import './globals.css'
@@ -83,12 +84,14 @@ export default function RootLayout({
       <body>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var m=document.cookie.match(/(?:^|; )theme=([^;]*)/);var t=m?decodeURIComponent(m[1]):null;if(t==='dark'||(t==null&&matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}})();`,
+            __html: `(function(){var m=document.cookie.match(/(?:^|; )theme=([^;]*)/);var t=m?decodeURIComponent(m[1]):null;if(t==='dark'){document.documentElement.classList.add('dark')}})();`,
           }}
         />
-        <OfflineBanner />
-        {children}
-        <PwaRegister />
+        <TooltipProvider>
+          <OfflineBanner />
+          {children}
+          <PwaRegister />
+        </TooltipProvider>
       </body>
     </html>
   )

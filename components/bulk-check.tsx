@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { StatusLegend } from './status-legend'
 import { Loader2, Search, AlertTriangle, FileText, Download, Maximize2 } from 'lucide-react'
 import Papa from 'papaparse'
 import type { EmailResult, CheckResponse } from '@/types'
@@ -258,7 +259,7 @@ export function BulkCheck() {
       {results.length > 0 || pendingEmails.length > 0 ? (
         <div className="space-y-3 animate-fade-up">
           <div className="rounded-lg border border-border overflow-hidden">
-            <div className="grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_80px_60px_80px] md:grid-cols-[1fr_80px_60px_80px_100px] gap-px bg-surface-overlay px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground border-b border-border">
+            <div className="grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_90px_60px_80px] md:grid-cols-[1fr_90px_60px_80px_100px] gap-3 bg-surface-overlay px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground border-b border-border">
               <span>Email</span>
               <span>Status</span>
               <span className="hidden sm:block">MX</span>
@@ -270,7 +271,7 @@ export function BulkCheck() {
               {results.map((r, i) => (
                 <div
                   key={r.email + i}
-                  className="grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_80px_60px_80px] md:grid-cols-[1fr_80px_60px_80px_100px] gap-px px-4 py-2.5 items-center result-row opacity-0 animate-fade-in"
+                  className="grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_90px_60px_80px] md:grid-cols-[1fr_90px_60px_80px_100px] gap-3 px-4 py-2.5 items-center result-row opacity-0 animate-fade-in"
                   style={{ animationDelay: `${Math.min(i * 30, 300)}ms`, animationFillMode: 'forwards' }}
                 >
                   <span className="font-mono text-xs truncate pr-2">{r.email}</span>
@@ -300,7 +301,7 @@ export function BulkCheck() {
               {pendingEmails.slice(0, 5).map((email, i) => (
                 <div
                   key={`pending-${email}-${i}`}
-                  className="grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_80px_60px_80px] md:grid-cols-[1fr_80px_60px_80px_100px] gap-px px-4 py-2.5 items-center"
+                  className="grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_90px_60px_80px] md:grid-cols-[1fr_90px_60px_80px_100px] gap-3 px-4 py-2.5 items-center"
                 >
                   <span className="font-mono text-xs truncate pr-2 text-muted-foreground/40">{email}</span>
                   <Skeleton className="h-5 w-14 rounded-full" />
@@ -336,6 +337,7 @@ export function BulkCheck() {
               </div>
             ) : null}
           </div>
+          <StatusLegend />
         </div>
       ) : null}
     </div>
