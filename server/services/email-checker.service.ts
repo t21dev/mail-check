@@ -85,11 +85,23 @@ interface SmtpResult {
   error?: string;
 }
 
+function getLastSmtpLine(data: string): string {
+  const lines = data.split(/\r?\n/).filter(l => l.length > 0);
+  return lines[lines.length - 1] ?? '';
+}
+
+function isSmtpFinal(data: string): boolean {
+  const last = getLastSmtpLine(data);
+  // Final line has a space after the 3-digit code (e.g., "250 OK"), not a dash ("250-...")
+  return last.length >= 4 && last.charAt(3) !== '-';
+}
+
 function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
   return new Promise((resolve) => {
     const timeout = 8000;
     let step = 0;
     let resolved = false;
+    let buffer = '';
 
     const done = (result: SmtpResult) => {
       if (resolved) return;
@@ -129,9 +141,14 @@ function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
     });
 
     socket.on('data', (data) => {
-      const response = data.toString().trim();
-      const code = parseInt(response.substring(0, 3), 10);
-      console.log(`[smtp] ${email} step=${step} code=${code} response=${response.substring(0, 80)}`);
+      buffer += data.toString();
+      if (!isSmtpFinal(buffer)) return; // wait for full multi-line response
+
+      const response = buffer.trim();
+      buffer = '';
+      const lastLine = getLastSmtpLine(response);
+      const code = parseInt(lastLine.substring(0, 3), 10);
+      console.log(`[smtp] ${email} step=${step} code=${code} response=${response.substring(0, 120)}`);
 
       if (step === 0 && code === 220) {
         step = 1;
@@ -146,9 +163,12 @@ function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
         step = 4;
         socket.write('QUIT\r\n');
         clearTimeout(hardTimeout);
+        // 550 5.7.x = policy/IP block, not a mailbox issue
+        const isIpBlocked = !!(code === 550 && response.match(/5\.7\.\d|blocked|blacklist|spamhaus|barracuda|denied/i));
         done({
           deliverable: code === 250,
           responseCode: code,
+          error: isIpBlocked ? 'ip_blocked' : undefined,
         });
       }
     });
@@ -204,18 +224,25 @@ export async function checkEmail(email: string): Promise<EmailResult> {
   }
 
   let isCatchAll = false;
-  try {
-    const randomEmail = `test-${Date.now()}-${Math.random().toString(36).slice(2)}@${domain}`;
-    console.log(`[check] Catch-all check: ${domain}`);
-    const catchAllResult = await smtpCheck(mxHost, randomEmail);
-    isCatchAll = catchAllResult.deliverable;
-    console.log(`[check] Catch-all result: ${domain} isCatchAll=${isCatchAll} (${Date.now() - start}ms)`);
-  } catch {
-    console.log(`[check] Catch-all failed: ${domain} (${Date.now() - start}ms)`);
+  // Skip catch-all check if IP is blocked or SMTP errored — no point retrying
+  if (smtp.deliverable && !smtp.error) {
+    try {
+      const randomEmail = `test-${Date.now()}-${Math.random().toString(36).slice(2)}@${domain}`;
+      console.log(`[check] Catch-all check: ${domain}`);
+      const catchAllResult = await smtpCheck(mxHost, randomEmail);
+      isCatchAll = catchAllResult.deliverable;
+      console.log(`[check] Catch-all result: ${domain} isCatchAll=${isCatchAll} (${Date.now() - start}ms)`);
+    } catch {
+      console.log(`[check] Catch-all failed: ${domain} (${Date.now() - start}ms)`);
+    }
   }
 
   let reachable: EmailResult['reachable'] = 'unknown';
-  if (smtp.deliverable && !isCatchAll) {
+  if (smtp.error === 'ip_blocked') {
+    // Our IP is blocked by the mail server — can't determine deliverability
+    reachable = 'unknown';
+    console.log(`[check] IP blocked by ${mxHost}, marking as unknown: ${email}`);
+  } else if (smtp.deliverable && !isCatchAll) {
     reachable = 'safe';
   } else if (smtp.deliverable && isCatchAll) {
     reachable = 'risky';
