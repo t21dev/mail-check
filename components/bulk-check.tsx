@@ -49,7 +49,7 @@ function exportCsv(results: EmailResult[]) {
   URL.revokeObjectURL(url)
 }
 
-async function checkBatch(emails: string[]): Promise<EmailResult[]> {
+async function checkBatch(emails: string[]): Promise<{ results: EmailResult[]; warning?: string }> {
   const res = await fetch('/api/check', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -57,7 +57,7 @@ async function checkBatch(emails: string[]): Promise<EmailResult[]> {
   })
   const data: CheckResponse = await res.json()
   if (data.error) throw new Error(data.error)
-  return data.results ?? []
+  return { results: data.results ?? [], warning: data.warning }
 }
 
 export function BulkCheck() {
@@ -67,6 +67,7 @@ export function BulkCheck() {
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState('')
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -81,6 +82,7 @@ export function BulkCheck() {
 
     setLoading(true)
     setError('')
+    setWarning('')
     setResults([])
     setPendingEmails(allEmails)
     setProgress('')
@@ -94,10 +96,11 @@ export function BulkCheck() {
         const batchNum = Math.floor(i / BATCH_SIZE) + 1
         setProgress(`Batch ${batchNum}/${totalBatches}`)
 
-        const batchResults = await checkBatch(batch)
+        const { results: batchResults, warning: batchWarning } = await checkBatch(batch)
         allResults.push(...batchResults)
         setResults([...allResults])
         setPendingEmails(allEmails.slice(i + BATCH_SIZE))
+        if (batchWarning) setWarning(batchWarning)
       }
 
       setProgress('')
@@ -253,6 +256,13 @@ export function BulkCheck() {
         <div className="flex items-center gap-2 text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2 animate-fade-in">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           {error}
+        </div>
+      ) : null}
+
+      {warning ? (
+        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 animate-fade-in">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          {warning}
         </div>
       ) : null}
 

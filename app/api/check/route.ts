@@ -46,7 +46,14 @@ export async function POST(request: NextRequest) {
     const start = Date.now();
     const results = await Promise.all(emails.map(email => checkEmail(email)));
     console.log(`[api/check] Done: ${emails.length} emails in ${Date.now() - start}ms`);
-    return NextResponse.json({ results });
+
+    // Warn if port 25 is blocked (all SMTP checks will be degraded)
+    const port25Blocked = results.some(r => r.smtp.error === 'port25_blocked');
+    const warning = port25Blocked
+      ? 'SMTP port 25 is blocked on this server. Results are based on syntax, MX records, and disposable detection only. SMTP deliverability could not be verified.'
+      : undefined;
+
+    return NextResponse.json({ results, warning });
   } catch (err) {
     console.error(`[api/check] Error:`, err);
     return NextResponse.json(

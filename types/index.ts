@@ -6,9 +6,11 @@ export interface EmailResult {
   smtp: { deliverable: boolean; responseCode: number | null; error?: string }
   isCatchAll: boolean
   isDisposable: boolean
+  provider?: 'gmail' | 'outlook' | 'yahoo' | 'other'
 }
 
 export interface CheckResponse {
   results?: EmailResult[]
   error?: string
+  warning?: string
 }

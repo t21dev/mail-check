@@ -44,6 +44,7 @@ export function SingleCheck() {
   const [result, setResult] = useState<EmailResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
 
   const handleCheck = useCallback(async () => {
     const trimmed = email.trim()
@@ -51,6 +52,7 @@ export function SingleCheck() {
 
     setLoading(true)
     setError('')
+    setWarning('')
     setResult(null)
 
     try {
@@ -65,6 +67,7 @@ export function SingleCheck() {
       } else if (data.results) {
         setResult(data.results[0])
       }
+      if (data.warning) setWarning(data.warning)
     } catch {
       setError('Failed to connect to the server')
     } finally {
@@ -137,6 +140,13 @@ export function SingleCheck() {
         <div className="flex items-center gap-2 text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2 animate-fade-in">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           {error}
+        </div>
+      ) : null}
+
+      {warning ? (
+        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 animate-fade-in">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          {warning}
         </div>
       ) : null}
 

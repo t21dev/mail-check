@@ -1,6 +1,20 @@
 import dns from 'dns';
 import net from 'net';
+import tls from 'tls';
+import os from 'os';
 import type { EmailResult } from '@/types';
+
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+
+const EHLO_HOSTNAME = process.env.EHLO_HOSTNAME || os.hostname() || '[127.0.0.1]';
+const MAIL_FROM = process.env.MAIL_FROM || 'verify@mail-check.t21.dev';
+const SMTP_TIMEOUT = 10_000;
+
+// ---------------------------------------------------------------------------
+// Disposable domains
+// ---------------------------------------------------------------------------
 
 const DISPOSABLE_DOMAINS = new Set([
   'mailinator.com', 'guerrillamail.com', 'tempmail.com', 'throwaway.email',
@@ -12,59 +26,47 @@ const DISPOSABLE_DOMAINS = new Set([
   'mintemail.com', 'tempr.email', 'fakeinbox.com', 'emailondeck.com',
   'getnada.com', 'temp-mail.org', 'tempail.com', 'mohmal.com',
   'burnermail.io', 'discard.email', 'discardmail.com', 'discardmail.de',
-  'drdrb.net', 'einrot.com', 'emailgo.de', 'emailisvalid.com',
-  'emailsensei.com', 'emailtemporario.com.br', 'ephemail.net',
-  'etranquil.com', 'etranquil.net', 'etranquil.org', 'evopo.com',
-  'explodemail.com', 'fakemailgenerator.com', 'fastacura.com',
-  'filzmail.com', 'fixmail.tk', 'flyspam.com', 'get-mail.cf',
-  'getairmail.com', 'getonemail.com', 'getonemail.net',
-  'gishpuppy.com', 'great-host.in', 'gsrv.co.uk', 'harakirimail.com',
-  'hartbot.de', 'hatespam.org', 'hidemail.de', 'hidzz.com',
-  'hmamail.com', 'hopemail.biz', 'ichimail.com', 'imails.info',
-  'inbax.tk', 'inbox.si', 'incognitomail.com', 'incognitomail.net',
-  'incognitomail.org', 'instant-mail.de', 'ip6.li',
-  'irish2me.com', 'iwi.net', 'jetable.com', 'jetable.fr.nf',
-  'jetable.net', 'jetable.org', 'jnxjn.com', 'jourrapide.com',
-  'kasmail.com', 'kaspop.com', 'keepmymail.com', 'killmail.com',
-  'killmail.net', 'klassmaster.com', 'klassmaster.net',
-  'klzlk.com', 'koszmail.pl', 'kurzepost.de', 'lawlita.com',
-  'letthemeatspam.com', 'lhsdv.com', 'lifebyfood.com', 'link2mail.net',
-  'litedrop.com', 'lookugly.com', 'lortemail.dk', 'lr78.com',
-  'lroid.com', 'lukop.dk', 'm21.cc', 'mail-temporaire.fr',
-  'mail.by', 'mail.zp.ua', 'mail2rss.org', 'mail333.com',
-  'mailbidon.com', 'mailblocks.com', 'mailbucket.org', 'mailcat.biz',
-  'maildu.de', 'maileater.com', 'maileimer.de', 'mailexpire.com',
-  'mailfa.tk', 'mailfree.ga', 'mailfree.gq', 'mailfree.ml',
-  'mailfreeonline.com', 'mailguard.me', 'mailhazard.com', 'mailhazard.us',
-  'mailhz.me', 'mailimate.com', 'mailin8r.com', 'mailinater.com',
-  'mailinator.net', 'mailinator.org', 'mailinator2.com', 'mailincubator.com',
-  'mailismagic.com', 'mailmate.com', 'mailme.ir', 'mailme.lv',
-  'mailmetrash.com', 'mailmoat.com', 'mailms.com', 'mailnator.com',
-  'mailnull.com', 'mailorg.org', 'mailpick.biz', 'mailproxsy.com',
-  'mailquack.com', 'mailrock.biz', 'mailsac.com', 'mailscrap.com',
-  'mailseal.de', 'mailshell.com', 'mailsiphon.com', 'mailslite.com',
-  'mailtemp.info', 'mailtothis.com', 'mailtrash.net', 'mailtv.net',
-  'mailtv.tv', 'mailzilla.com', 'mailzilla.org',
-  'meinspamschutz.de', 'meltmail.com', 'messagebeamer.de',
-  'mfsa.ru', 'mierdamail.com', 'migmail.pl', 'migumail.com',
-  'mmmmail.com', 'moakt.com', 'mobi.web.id', 'mobileninja.co.uk',
-  'mt2015.com', 'my10telemail.com', 'mycard.net.ua', 'mycleaninbox.net',
-  'myemailboxy.com', 'mymail-in.net', 'mymailoasis.com', 'mynetstore.de',
-  'mypacks.net', 'myphantom.com', 'mysamp.de',
-  'mytemp.email', 'mytempmail.com', 'mytrashmail.com', 'nabala.com',
-  'neomailbox.com', 'nepwk.com', 'nervmich.net', 'nervtansen.de',
-  'netmails.com', 'netmails.net', 'neverbox.com', 'no-spam.ws',
-  'nobulk.com', 'noclickemail.com', 'nogmailspam.info',
-  'nomail2me.com', 'nomorespamemails.com', 'nonspam.eu', 'nonspammer.de',
-  'noref.in', 'nospam4.us', 'nospamfor.us',
-  'nospammail.net', 'nothingtoseehere.ca', 'nowmymail.com',
+  'drdrb.net', 'einrot.com', 'emailgo.de', 'mailfa.tk',
+  'mailfree.ga', 'mailfree.gq', 'mailfree.ml', 'mailfreeonline.com',
+  'mailinator.net', 'mailinator.org', 'mailinator2.com',
+  'mailnull.com', 'mailsac.com', 'mailtemp.info', 'mailtothis.com',
+  'mailtrash.net', 'meltmail.com', 'moakt.com', 'mytemp.email',
+  'mytempmail.com', 'mytrashmail.com', 'neverbox.com', 'no-spam.ws',
+  'nospammail.net', 'nowmymail.com', 'tempail.com',
+  'temp-mail.io', 'tempmailo.com', 'tmpmail.org', 'tmpmail.net',
+  'guerrillamailblock.com', '10minutemail.com', 'throwaway.email',
+  'trashmail.io', 'wegwerfmail.de', 'spamgourmet.com',
 ]);
+
+// ---------------------------------------------------------------------------
+// Provider detection
+// ---------------------------------------------------------------------------
+
+type EmailProvider = 'gmail' | 'outlook' | 'yahoo' | 'other';
+
+function detectProvider(mxRecords: string[]): EmailProvider {
+  const joined = mxRecords.join(' ').toLowerCase();
+  if (joined.includes('google.com') || joined.includes('googlemail.com')) return 'gmail';
+  if (joined.includes('outlook.com') || joined.includes('microsoft.com') ||
+      joined.includes('hotmail.com') || joined.includes('live.com') ||
+      joined.includes('.protection.outlook.com')) return 'outlook';
+  if (joined.includes('yahoodns.net') || joined.includes('yahoo.com')) return 'yahoo';
+  return 'other';
+}
+
+// ---------------------------------------------------------------------------
+// Syntax check
+// ---------------------------------------------------------------------------
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function checkSyntax(email: string): { valid: boolean } {
   return { valid: EMAIL_REGEX.test(email) };
 }
+
+// ---------------------------------------------------------------------------
+// MX check
+// ---------------------------------------------------------------------------
 
 async function checkMx(domain: string): Promise<{ found: boolean; records: string[] }> {
   try {
@@ -79,6 +81,49 @@ async function checkMx(domain: string): Promise<{ found: boolean; records: strin
   }
 }
 
+// ---------------------------------------------------------------------------
+// Port 25 diagnostic (cached, runs once)
+// ---------------------------------------------------------------------------
+
+let port25Status: 'open' | 'blocked' | 'unknown' = 'unknown';
+let port25Checked = false;
+
+async function checkPort25(): Promise<'open' | 'blocked'> {
+  if (port25Checked) return port25Status as 'open' | 'blocked';
+  port25Checked = true;
+
+  return new Promise((resolve) => {
+    // Try connecting to Gmail's MX on port 25 — the most reliable test
+    const s = net.createConnection(25, 'gmail-smtp-in.l.google.com');
+    s.setTimeout(5000);
+    s.on('connect', () => {
+      port25Status = 'open';
+      s.destroy();
+      console.log('[diag] Port 25 outbound: OPEN');
+      resolve('open');
+    });
+    s.on('timeout', () => {
+      port25Status = 'blocked';
+      s.destroy();
+      console.log('[diag] Port 25 outbound: BLOCKED (timeout)');
+      resolve('blocked');
+    });
+    s.on('error', (err) => {
+      port25Status = 'blocked';
+      s.destroy();
+      console.log(`[diag] Port 25 outbound: BLOCKED (${err.message})`);
+      resolve('blocked');
+    });
+  });
+}
+
+// Run on startup
+checkPort25();
+
+// ---------------------------------------------------------------------------
+// SMTP helpers
+// ---------------------------------------------------------------------------
+
 interface SmtpResult {
   deliverable: boolean;
   responseCode: number | null;
@@ -92,144 +137,287 @@ function getLastSmtpLine(data: string): string {
 
 function isSmtpFinal(data: string): boolean {
   const last = getLastSmtpLine(data);
-  // Final line has a space after the 3-digit code (e.g., "250 OK"), not a dash ("250-...")
   return last.length >= 4 && last.charAt(3) !== '-';
 }
 
+// ---------------------------------------------------------------------------
+// SMTP check — with STARTTLS, proper EHLO, better error classification
+// ---------------------------------------------------------------------------
+
 function smtpCheck(mxHost: string, email: string): Promise<SmtpResult> {
   return new Promise((resolve) => {
-    const timeout = 8000;
     let step = 0;
     let resolved = false;
     let buffer = '';
+    let activeSocket: net.Socket;
+    let starttlsSupported = false;
 
     const done = (result: SmtpResult) => {
       if (resolved) return;
       resolved = true;
-      socket.destroy();
+      clearTimeout(hardTimer);
+      try { activeSocket.destroy(); } catch { /* noop */ }
       resolve(result);
     };
 
-    // Hard deadline fallback in case socket events never fire
-    const hardTimeout = setTimeout(() => {
+    const hardTimer = setTimeout(() => {
       console.log(`[smtp] Hard timeout for ${email} via ${mxHost}`);
-      done({ deliverable: false, responseCode: null, error: 'hard timeout' });
-    }, timeout + 2000);
+      done({ deliverable: false, responseCode: null, error: 'timeout' });
+    }, SMTP_TIMEOUT + 3000);
 
-    const socket = net.createConnection(25, mxHost);
-    socket.setTimeout(timeout);
+    const rawSocket = net.createConnection(25, mxHost);
+    activeSocket = rawSocket;
+    rawSocket.setTimeout(SMTP_TIMEOUT);
 
-    socket.on('connect', () => {
+    rawSocket.on('connect', () => {
       console.log(`[smtp] Connected to ${mxHost}:25 for ${email}`);
     });
 
-    socket.on('timeout', () => {
+    rawSocket.on('timeout', () => {
       console.log(`[smtp] Timeout for ${email} via ${mxHost} at step ${step}`);
-      clearTimeout(hardTimeout);
       done({ deliverable: false, responseCode: null, error: 'timeout' });
     });
 
-    socket.on('error', (err) => {
+    rawSocket.on('error', (err) => {
       console.log(`[smtp] Error for ${email} via ${mxHost}: ${err.message}`);
-      clearTimeout(hardTimeout);
-      done({ deliverable: false, responseCode: null, error: err.message });
+      const msg = err.message.toLowerCase();
+      const error = msg.includes('econnrefused') ? 'port25_blocked'
+        : msg.includes('econnreset') ? 'connection_reset'
+        : msg.includes('etimedout') ? 'timeout'
+        : err.message;
+      done({ deliverable: false, responseCode: null, error });
     });
 
-    socket.on('close', () => {
-      clearTimeout(hardTimeout);
-      done({ deliverable: false, responseCode: null, error: 'connection closed' });
+    rawSocket.on('close', () => {
+      done({ deliverable: false, responseCode: null, error: 'connection_closed' });
     });
 
-    socket.on('data', (data) => {
+    function handleData(data: Buffer) {
       buffer += data.toString();
-      if (!isSmtpFinal(buffer)) return; // wait for full multi-line response
+      if (!isSmtpFinal(buffer)) return;
 
       const response = buffer.trim();
       buffer = '';
       const lastLine = getLastSmtpLine(response);
       const code = parseInt(lastLine.substring(0, 3), 10);
-      console.log(`[smtp] ${email} step=${step} code=${code} response=${response.substring(0, 120)}`);
+      console.log(`[smtp] ${email} step=${step} code=${code} resp=${response.substring(0, 150)}`);
 
-      if (step === 0 && code === 220) {
-        step = 1;
-        socket.write('EHLO mail.example.com\r\n');
-      } else if (step === 1 && code === 250) {
-        step = 2;
-        socket.write('MAIL FROM:<check@example.com>\r\n');
-      } else if (step === 2 && code === 250) {
-        step = 3;
-        socket.write(`RCPT TO:<${email}>\r\n`);
-      } else if (step === 3) {
-        step = 4;
-        socket.write('QUIT\r\n');
-        clearTimeout(hardTimeout);
-        // 550 5.7.x = policy/IP block, not a mailbox issue
-        const isIpBlocked = !!(code === 550 && response.match(/5\.7\.\d|blocked|blacklist|spamhaus|barracuda|denied/i));
-        done({
-          deliverable: code === 250,
-          responseCode: code,
-          error: isIpBlocked ? 'ip_blocked' : undefined,
-        });
+      // Step 0: Banner (220)
+      if (step === 0) {
+        if (code === 220) {
+          step = 1;
+          activeSocket.write(`EHLO ${EHLO_HOSTNAME}\r\n`);
+        } else {
+          done({ deliverable: false, responseCode: code, error: 'banner_rejected' });
+        }
+        return;
       }
-    });
+
+      // Step 1: EHLO response — check for STARTTLS
+      if (step === 1) {
+        if (code === 250) {
+          starttlsSupported = /STARTTLS/i.test(response);
+          if (starttlsSupported) {
+            step = 2; // send STARTTLS
+            activeSocket.write('STARTTLS\r\n');
+          } else {
+            // No TLS, proceed unencrypted
+            step = 4; // MAIL FROM
+            activeSocket.write(`MAIL FROM:<${MAIL_FROM}>\r\n`);
+          }
+        } else {
+          done({ deliverable: false, responseCode: code, error: 'ehlo_rejected' });
+        }
+        return;
+      }
+
+      // Step 2: STARTTLS response (220 = ready to start TLS)
+      if (step === 2) {
+        if (code === 220) {
+          // Upgrade to TLS
+          const tlsSocket = tls.connect(
+            { socket: rawSocket, servername: mxHost, rejectUnauthorized: false },
+            () => {
+              activeSocket = tlsSocket;
+              tlsSocket.on('data', handleData);
+              tlsSocket.on('error', (err) => {
+                console.log(`[smtp] TLS error for ${email}: ${err.message}`);
+                done({ deliverable: false, responseCode: null, error: 'tls_error' });
+              });
+              // RFC requires re-sending EHLO after STARTTLS
+              step = 3;
+              tlsSocket.write(`EHLO ${EHLO_HOSTNAME}\r\n`);
+            }
+          );
+          tlsSocket.on('error', (err) => {
+            console.log(`[smtp] TLS handshake error for ${email}: ${err.message}`);
+            done({ deliverable: false, responseCode: null, error: 'tls_error' });
+          });
+        } else {
+          // STARTTLS failed, try without TLS
+          step = 4;
+          activeSocket.write(`MAIL FROM:<${MAIL_FROM}>\r\n`);
+        }
+        return;
+      }
+
+      // Step 3: post-TLS EHLO response
+      if (step === 3) {
+        if (code === 250) {
+          step = 4;
+          activeSocket.write(`MAIL FROM:<${MAIL_FROM}>\r\n`);
+        } else {
+          done({ deliverable: false, responseCode: code, error: 'ehlo_after_tls_rejected' });
+        }
+        return;
+      }
+
+      // Step 4: MAIL FROM response
+      if (step === 4) {
+        if (code === 250) {
+          step = 5;
+          activeSocket.write(`RCPT TO:<${email}>\r\n`);
+        } else {
+          done({ deliverable: false, responseCode: code, error: 'mail_from_rejected' });
+        }
+        return;
+      }
+
+      // Step 5: RCPT TO response — the actual verification
+      if (step === 5) {
+        step = 6;
+        activeSocket.write('QUIT\r\n');
+
+        // Classify the response
+        if (code === 250 || code === 251) {
+          done({ deliverable: true, responseCode: code });
+          return;
+        }
+
+        // IP/policy block — not a mailbox issue
+        if (response.match(/5\.7\.\d|blocked|blacklist|spamhaus|barracuda|denied|reject/i)) {
+          done({ deliverable: false, responseCode: code, error: 'ip_blocked' });
+          return;
+        }
+
+        // Temporary failures (4xx) — greylisting, rate limiting
+        if (code >= 400 && code < 500) {
+          done({ deliverable: false, responseCode: code, error: 'greylisted' });
+          return;
+        }
+
+        // Permanent failures (5xx) — mailbox doesn't exist
+        done({ deliverable: false, responseCode: code });
+        return;
+      }
+
+      // Step 6: QUIT ack — ignore
+    }
+
+    rawSocket.on('data', handleData);
   });
 }
+
+// ---------------------------------------------------------------------------
+// Try multiple MX hosts
+// ---------------------------------------------------------------------------
+
+async function smtpCheckAllMx(mxRecords: string[], email: string): Promise<SmtpResult> {
+  for (const mxHost of mxRecords.slice(0, 3)) {
+    const result = await smtpCheck(mxHost, email);
+
+    // Definitive answer — use it
+    if (result.deliverable) return result;
+    if (result.responseCode !== null && result.responseCode >= 500) return result;
+
+    // Connectivity issue — try next MX
+    if (result.error === 'timeout' || result.error === 'port25_blocked' ||
+        result.error === 'connection_reset' || result.error === 'connection_closed') {
+      console.log(`[smtp] ${mxHost} unreachable, trying next MX...`);
+      continue;
+    }
+
+    // Any other coded response — use it
+    if (result.responseCode !== null) return result;
+  }
+
+  return { deliverable: false, responseCode: null, error: 'all_mx_failed' };
+}
+
+// ---------------------------------------------------------------------------
+// Main email check
+// ---------------------------------------------------------------------------
 
 export async function checkEmail(email: string): Promise<EmailResult> {
   const start = Date.now();
   email = email.trim().toLowerCase();
   console.log(`[check] Starting: ${email}`);
 
+  // Syntax
   const syntax = checkSyntax(email);
   if (!syntax.valid) {
     console.log(`[check] Invalid syntax: ${email} (${Date.now() - start}ms)`);
     return {
-      email,
-      syntax,
+      email, syntax,
       mx: { found: false, records: [] },
       smtp: { deliverable: false, responseCode: null },
-      isCatchAll: false,
-      isDisposable: false,
-      reachable: 'invalid',
+      isCatchAll: false, isDisposable: false, reachable: 'invalid',
     };
   }
 
   const domain = email.split('@')[1];
   const isDisposable = DISPOSABLE_DOMAINS.has(domain);
+
+  // MX
   const mx = await checkMx(domain);
   console.log(`[check] MX for ${domain}: found=${mx.found} records=[${mx.records.join(', ')}] (${Date.now() - start}ms)`);
 
   if (!mx.found) {
     console.log(`[check] No MX: ${email} (${Date.now() - start}ms)`);
     return {
-      email,
-      syntax,
-      mx,
+      email, syntax, mx,
       smtp: { deliverable: false, responseCode: null },
-      isCatchAll: false,
-      isDisposable,
-      reachable: 'invalid',
+      isCatchAll: false, isDisposable, reachable: 'invalid',
     };
   }
 
-  const mxHost = mx.records[0];
-  let smtp: SmtpResult;
-  try {
-    console.log(`[check] SMTP check: ${email} via ${mxHost}`);
-    smtp = await smtpCheck(mxHost, email);
-    console.log(`[check] SMTP result: ${email} deliverable=${smtp.deliverable} code=${smtp.responseCode} (${Date.now() - start}ms)`);
-  } catch {
-    console.log(`[check] SMTP failed: ${email} (${Date.now() - start}ms)`);
-    smtp = { deliverable: false, responseCode: null, error: 'connection failed' };
+  // Check if port 25 is even available
+  const portStatus = await checkPort25();
+  if (portStatus === 'blocked') {
+    console.log(`[check] Port 25 blocked, skipping SMTP for ${email} (${Date.now() - start}ms)`);
+    const provider = detectProvider(mx.records);
+    // We can't verify via SMTP, but we have MX + syntax + disposable info
+    let reachable: EmailResult['reachable'] = 'unknown';
+    if (isDisposable) reachable = 'risky';
+    return {
+      email, syntax, mx,
+      smtp: { deliverable: false, responseCode: null, error: 'port25_blocked' } as EmailResult['smtp'],
+      isCatchAll: false, isDisposable, reachable,
+      provider,
+    } as EmailResult;
   }
 
+  const provider = detectProvider(mx.records);
+
+  // SMTP — try all MX hosts
+  let smtp: SmtpResult;
+  try {
+    console.log(`[check] SMTP check: ${email} (provider=${provider})`);
+    smtp = await smtpCheckAllMx(mx.records, email);
+    console.log(`[check] SMTP result: ${email} deliverable=${smtp.deliverable} code=${smtp.responseCode} error=${smtp.error} (${Date.now() - start}ms)`);
+  } catch {
+    console.log(`[check] SMTP failed: ${email} (${Date.now() - start}ms)`);
+    smtp = { deliverable: false, responseCode: null, error: 'connection_failed' };
+  }
+
+  // Catch-all — only if SMTP worked and email was deliverable
   let isCatchAll = false;
-  // Skip catch-all check if IP is blocked or SMTP errored — no point retrying
   if (smtp.deliverable && !smtp.error) {
     try {
-      const randomEmail = `test-${Date.now()}-${Math.random().toString(36).slice(2)}@${domain}`;
+      const randomUser = `xq9z7k2m4p${Date.now()}`;
+      const fakeEmail = `${randomUser}@${domain}`;
       console.log(`[check] Catch-all check: ${domain}`);
-      const catchAllResult = await smtpCheck(mxHost, randomEmail);
+      const catchAllResult = await smtpCheck(mx.records[0], fakeEmail);
       isCatchAll = catchAllResult.deliverable;
       console.log(`[check] Catch-all result: ${domain} isCatchAll=${isCatchAll} (${Date.now() - start}ms)`);
     } catch {
@@ -237,11 +425,15 @@ export async function checkEmail(email: string): Promise<EmailResult> {
     }
   }
 
+  // Classify reachability
   let reachable: EmailResult['reachable'] = 'unknown';
+
   if (smtp.error === 'ip_blocked') {
-    // Our IP is blocked by the mail server — can't determine deliverability
     reachable = 'unknown';
-    console.log(`[check] IP blocked by ${mxHost}, marking as unknown: ${email}`);
+    console.log(`[check] IP blocked, marking as unknown: ${email}`);
+  } else if (smtp.error === 'greylisted') {
+    reachable = 'unknown';
+    console.log(`[check] Greylisted (4xx), marking as unknown: ${email}`);
   } else if (smtp.deliverable && !isCatchAll) {
     reachable = 'safe';
   } else if (smtp.deliverable && isCatchAll) {
@@ -252,13 +444,11 @@ export async function checkEmail(email: string): Promise<EmailResult> {
     reachable = 'risky';
   }
 
+  console.log(`[check] Done: ${email} => ${reachable} (${Date.now() - start}ms)`);
+
   return {
-    email,
-    syntax,
-    mx,
-    smtp,
-    isCatchAll,
-    isDisposable,
-    reachable,
+    email, syntax, mx,
+    smtp: { deliverable: smtp.deliverable, responseCode: smtp.responseCode },
+    isCatchAll, isDisposable, reachable,
   };
 }
