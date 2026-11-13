@@ -131,6 +131,10 @@ cli.js                CLI entry point
 
 Returns results with reachability status: `safe`, `risky`, `invalid`, or `unknown`.
 
+## Support
+
+This project is free and open source. If it saves you time, you can support [Team 21](https://t21.dev) on [Patreon](https://www.patreon.com/triptex). It pays for code signing, app store fees and servers.
+
 ## License
 
 MIT
